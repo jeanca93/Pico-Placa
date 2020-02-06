@@ -1,0 +1,191 @@
+﻿@model PicoYplaca.Models.PicoPlacaModel
+@{
+    ViewBag.Title = "Pico & placa predictor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Start your project here-->
+<div style="height: 100%">
+    <div class="flex-center flex-column main-picture">
+        <!--Card-->
+        <div class="card m-5" style="width: 25rem;">
+            <!--Card image-->
+            <div class="view overlay">
+                <img src='@Url.Content("~/Content/Images/PicoPlaca.jpg")' class="img-fluid" alt="Pico & Placa predictor">
+            </div>
+            <!--Card content-->
+            <div class="card-body">
+                @using (Ajax.BeginForm("", "", null,
+            new AjaxOptions()
+            {
+                HttpMethod = "POST",
+                Url = "/api/PicoPlaca/Validate",
+                OnBegin = "enableDisableSubmitButton(false);",
+                OnComplete = "enableDisableSubmitButton(true);",
+                OnSuccess = "onSuccessAction",
+                OnFailure = "onFailureAction",
+            }, new { @class = "form", @style = "color: #757575;" }))
+                {
+                    <!-- Car plate -->
+                    <div class="md-form mt-0">
+                        <i class="fas fa-car prefix"></i>
+                        @Html.TextBoxFor(m => m.Plate, new { @class = "form-control", placeholder = HttpUtility.HtmlDecode(Html.DisplayNameFor(x => x.Plate).ToHtmlString()) })
+                        @Html.LabelFor(m => m.Plate)
+                        @Html.ValidationMessageFor(m => m.Plate, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <!-- Date -->
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.Date)
+                                @Html.TextBoxFor(m => m.Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @min = DateTime.Now.ToString("yyyy-MM-dd"), @data_val_date = $"El campo {HttpUtility.HtmlDecode(Html.DisplayNameFor(x => x.Date).ToHtmlString())} debe ser una fecha válida" })
+                                @Html.ValidationMessageFor(m => m.Date, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Time -->
+                            <div class="form-group">
+                                @Html.LabelFor(m => m.TimeField)
+                                @Html.TextBoxFor(m => m.TimeField, "{0:HH:mm}", new { @class = "form-control", type = "time", @data_val_time = $"El campo {HttpUtility.HtmlDecode(Html.DisplayNameFor(x => x.Date).ToHtmlString())} debe ser una hora válida" })
+                                @Html.ValidationMessageFor(m => m.TimeField, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <br />
+                    @Html.HiddenFor(m => m.Time)
+                    <!-- Sign up button -->
+                    <button class="btn btn-outline-info btn-rounded btn-block my-4 waves-effect z-depth-0" type="submit">Consultar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End your project here-->
+
+@section optionalJS
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jquery-ajax")
+}
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/notify")
+    @Scripts.Render("~/bundles/sweetalert2")
+    <script type="text/javascript">
+        function enableDisableSubmitButton(enabled) {
+            var buttons = document.querySelectorAll('button[type="submit"]');
+
+            if (buttons != null) {
+                var content = (enabled
+                    ? "Consultar"
+                    : "<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Procesando..."
+                );
+
+                buttons.forEach((button) => {
+                    button.disabled = !enabled;
+                    button.innerHTML = content;
+                });
+            }
+        };
+        function onSuccessAction(result) {
+            var type = (result.Valid ? "success" : "error");
+            var title = (result.Valid ? "¡Éxito!" : "¡Advertencia!");
+            var button = (result.Valid ? "btn btn-primary" : "btn btn-danger");
+
+            Swal.fire({
+                title: title,
+                text: result.Message,
+                type: type,
+                buttonsStyling: false,
+                confirmButtonClass: button
+            });
+        }
+        function onFailureAction(result) {
+            var type = "danger";
+            var message = result.responseJSON.MessageDetail;
+
+            if (result.status === 400) {
+                type = "warning";
+                message = result.responseJSON.message;
+            } else if (result.status === 401)
+                message = "No tiene permisos para realizar la acci\xf3n requerida";
+
+            notify('Error al realizar acci\xf3n', message, type);
+        };
+        function notify(title, message, type, onClosed) {
+            $.notify({
+                    icon: 'ni ni-bell-55',
+                    title: title,
+                    message: message,
+                    url: ''
+                },
+                {
+                    element: 'body',
+                    type: type,
+                    allow_dismiss: true,
+                    placement: {
+                        from: 'bottom',
+                        align: 'left'
+                    },
+                    offset: {
+                        x: 15,
+                        y: 15
+                    },
+                    spacing: 10,
+                    z_index: 1080,
+                    delay: 5000,
+                    url_target: '_blank',
+                    mouse_over: false,
+                    animate: {
+                        enter: 'animated fadeInDown',
+                        exit: 'animated fadeOutUp'
+                    },
+                    template:
+                        '<div data-notify="container" class="alert alert-dismissible alert-{0} alert-notify" role="alert">' +
+                            '<span class="alert-icon" data-notify="icon"></span> ' +
+                            '<div class="alert-text"</div> ' +
+                            '<span class="alert-title" data-notify="title">{1}</span> ' +
+                            '<span data-notify="message">{2}</span>' +
+                            '</div>' +
+                            //'<div class="progress" data-notify="progressbar">' +
+                            //    '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+                            //'</div>' +
+                            //'<a href="{3}" target="{4}" data-notify="url"></a>' +
+                            '<button type="button" class="close" data-notify="dismiss" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                            '</div>',
+                    onClosed: onClosed
+                }
+            );
+        };
+    </script>
+    <script type="text/javascript">
+        $("input[data-val-length-max]").each(function (index, element) {
+            var length = parseInt($(this).attr("data-val-length-max"));
+            $(this).prop("maxlength", length);
+        });
+
+        $('#Plate').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#Plate').keyup(function (e) {
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        $("#TimeField").on("input", function () {
+            var time = $("#TimeField").val().replace(':', '');
+
+            if (time)
+                $("#Time").val(parseInt(time));
+        });
+    </script>
+}
