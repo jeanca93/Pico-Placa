@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Web;
+using System.Linq;
 using PicoYplaca.Common;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PicoYplaca.Models
 {
@@ -16,6 +16,7 @@ namespace PicoYplaca.Models
         [Required(ErrorMessage = Constants.RequiredFieldMessage)]
         public string Plate { get; set; }
 
+        [CheckDateRange]
         [DataType(DataType.Date)]
         [DisplayName("Fecha")]
         [Required(ErrorMessage = Constants.RequiredFieldMessage)]

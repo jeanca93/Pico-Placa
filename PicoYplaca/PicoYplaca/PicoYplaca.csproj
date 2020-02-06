@@ -348,10 +348,12 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Common\CheckDateRangeAttribute.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Controllers\api\PicoPlacaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Dtos\PicoPlacaDto.cs" />
+    <Compile Include="Dtos\PicoPlataValidateDto.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

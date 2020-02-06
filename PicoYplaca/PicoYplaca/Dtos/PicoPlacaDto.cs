@@ -14,6 +14,7 @@ namespace PicoYplaca.Dtos
         [Required(ErrorMessage = Constants.RequiredFieldMessage)]
         public string Plate { get; set; }
 
+        [CheckDateRange]
         [DataType(DataType.Date)]
         [Required(ErrorMessage = Constants.RequiredFieldMessage)]
         public DateTime Date { get; set; }

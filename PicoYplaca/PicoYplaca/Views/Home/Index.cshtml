@@ -22,7 +22,7 @@
                 Url = "/api/PicoPlaca/Validate",
                 OnBegin = "enableDisableSubmitButton(false);",
                 OnComplete = "enableDisableSubmitButton(true);",
-                OnSuccess = "",
+                OnSuccess = "onSuccessAction",
                 OnFailure = "onFailureAction",
             }, new { @class = "form", @style = "color: #757575;" }))
                 {
@@ -38,7 +38,7 @@
                             <!-- Date -->
                             <div class="form-group">
                                 @Html.LabelFor(m => m.Date)
-                                @Html.TextBoxFor(m => m.Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @data_val_date = $"El campo {HttpUtility.HtmlDecode(Html.DisplayNameFor(x => x.Date).ToHtmlString())} debe ser una fecha válida" })
+                                @Html.TextBoxFor(m => m.Date, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", @min = DateTime.Now.ToString("yyyy-MM-dd"), @data_val_date = $"El campo {HttpUtility.HtmlDecode(Html.DisplayNameFor(x => x.Date).ToHtmlString())} debe ser una fecha válida" })
                                 @Html.ValidationMessageFor(m => m.Date, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -89,6 +89,19 @@
                 });
             }
         };
+        function onSuccessAction(result) {
+            var type = (result.Valid ? "success" : "error");
+            var title = (result.Valid ? "¡Éxito!" : "¡Advertencia!");
+            var button = (result.Valid ? "btn btn-primary" : "btn btn-danger");
+
+            Swal.fire({
+                title: title,
+                text: result.Message,
+                type: type,
+                buttonsStyling: false,
+                confirmButtonClass: button
+            });
+        }
         function onFailureAction(result) {
             var type = "danger";
             var message = result.responseJSON.MessageDetail;
